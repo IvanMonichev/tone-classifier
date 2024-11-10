@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier
 
 
@@ -78,7 +79,7 @@ def train_logistic_regression(x_train, y_train):
     return clf
 
 
-def train_xgb_classifier(x_train, y_train):  # Updated function name
+def train_xgb_classifier(x_train, y_train):
     xgb_clf = XGBClassifier(
         learning_rate=0.1,
         n_estimators=1000,
@@ -92,6 +93,7 @@ def train_xgb_classifier(x_train, y_train):  # Updated function name
         scale_pos_weight=1,
         seed=27
     )
+
     xgb_clf.fit(x_train, y_train)
     return xgb_clf
 
@@ -126,8 +128,13 @@ if __name__ == '__main__':
     vectorized_x_train, vectorized_x_test = classify_with_char_vectorizer(x_train, x_test)
 
     # Шаг 4: Обучение модели логистической регрессии
-
     # clf = train_logistic_regression(vectorized_x_train, y_train)
+
+    # Обучение через xgb_classifier
+    # Преобразование меток в числовые значения
+    label_encoder = LabelEncoder()
+    y_train = label_encoder.fit_transform(y_train)
+    y_test = label_encoder.transform(y_test)
     xgb_clf = train_xgb_classifier(vectorized_x_train, y_train)
 
     # Шаг 5: Оценка модели
