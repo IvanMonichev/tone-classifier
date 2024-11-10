@@ -5,10 +5,11 @@ import nltk
 import pandas as pd
 from nltk import word_tokenize
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
+from xgboost import XGBClassifier
 
 
 def download_ntlk_data():
@@ -27,11 +28,9 @@ def load_and_label_data(positive_path, negative_path):
     positive = pd.read_csv(positive_path, sep=';', usecols=[3], names=['text'])
     negative = pd.read_csv(negative_path, sep=';', usecols=[3], names=['text'])
 
-    # Присвоение меток "positive" и "negative" для классов
     positive['label'] = 'positive'
     negative['label'] = 'negative'
 
-    # Объединение положительных и отрицательных данных в один DataFrame
     return pd.concat([positive, negative])
 
 
@@ -79,6 +78,24 @@ def train_logistic_regression(x_train, y_train):
     return clf
 
 
+def train_xgb_classifier(x_train, y_train):  # Updated function name
+    xgb_clf = XGBClassifier(
+        learning_rate=0.1,
+        n_estimators=1000,
+        max_depth=5,
+        min_child_weight=3,
+        gamma=0.2,
+        subsample=0.6,
+        colsample_bytree=1.0,
+        objective='binary:logistic',
+        nthread=4,
+        scale_pos_weight=1,
+        seed=27
+    )
+    xgb_clf.fit(x_train, y_train)
+    return xgb_clf
+
+
 def evaluate_model(clf, x_test, y_test):
     pred = clf.predict(x_test)
     print(classification_report(y_test, pred))
@@ -109,7 +126,9 @@ if __name__ == '__main__':
     vectorized_x_train, vectorized_x_test = classify_with_char_vectorizer(x_train, x_test)
 
     # Шаг 4: Обучение модели логистической регрессии
-    clf = train_logistic_regression(vectorized_x_train, y_train)
+
+    # clf = train_logistic_regression(vectorized_x_train, y_train)
+    xgb_clf = train_xgb_classifier(vectorized_x_train, y_train)
 
     # Шаг 5: Оценка модели
-    evaluate_model(clf, vectorized_x_test, y_test)
+    evaluate_model(xgb_clf, vectorized_x_test, y_test)
