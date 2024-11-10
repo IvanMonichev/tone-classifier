@@ -37,24 +37,3 @@ if __name__ == '__main__':
     clf = train_random_forest(vectorized_x_train, y_train)
 
     evaluate_model(clf, vectorized_x_test, y_test)
-
-    # Умная векторизация с токенами
-    # vectorized_x_train, vectorized_x_test = vectorize_texts_with_tokens(x_train, x_test, CountVectorizer,(1, 2))
-
-    # Векторизация без стоп-слов
-    # vectorized_x_train, vectorized_x_test = vectorize_texts_no_stopwords(x_train, x_test, CountVectorizer, (1, 2))
-
-    # Шаг 4: Обучение модели логистической регрессии
-    # clf = train_logistic_regression(vectorized_x_train, y_train)
-
-    # Обучение через xgb_classifier
-    # Преобразование меток в числовые значения
-    # label_encoder = LabelEncoder()
-    # y_train = label_encoder.fit_transform(y_train)
-    # y_test = label_encoder.transform(y_test)
-    # clf = train_xgb_classifier(vectorized_x_train, y_train)
-
-    # Обучение через случайный лес
-
-    # Шаг 5: Оценка модели
-    # evaluate_model(clf, vectorized_x_test, y_test)
