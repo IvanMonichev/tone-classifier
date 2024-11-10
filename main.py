@@ -19,7 +19,7 @@ def download_ntlk_data():
     else:
         ssl._create_default_https_context = _create_unverified_https_context
 
-    nltk.download('punkt')
+    nltk.download('punkt_tab')
     nltk.download('stopwords')
 
 
@@ -52,7 +52,25 @@ def vectorize_texts_with_tokens(x_train, x_test, vectorizer_class=CountVectorize
     vectorized_x_train = vectorizer.fit_transform(x_train)
     vectorized_x_test = vectorizer.transform(x_test)
 
-    return vectorized_x_train, vectorized_x_test, vectorizer
+    return vectorized_x_train, vectorized_x_test
+
+
+def vectorize_texts_no_stopwords(x_train, x_test, vectorizer_class=CountVectorizer, ngram_range=(1, 2)):
+    vectorizer = vectorizer_class(ngram_range=ngram_range, tokenizer=word_tokenize)
+
+    vectorized_x_train = vectorizer.fit_transform(x_train)
+    vectorized_x_test = vectorizer.transform(x_test)
+
+    return vectorized_x_train, vectorized_x_test
+
+
+def classify_with_char_vectorizer(x_train, x_test):
+    vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 1))
+
+    vectorized_x_train = vectorizer.fit_transform(x_train)
+    vectorized_x_test = vectorizer.transform(x_test)
+
+    return vectorized_x_train, vectorized_x_test
 
 
 def train_logistic_regression(x_train, y_train):
@@ -82,8 +100,13 @@ if __name__ == '__main__':
     # vectorized_x_train, vectorized_x_test, vectorizer = vectorize_texts_with_tokens(x_train, x_test, TfidfVectorizer, (1, 1))
 
     # Умная векторизация с токенами
-    vectorized_x_train, vectorized_x_test, vectorizer = vectorize_texts_with_tokens(x_train, x_test, CountVectorizer,
-                                                                                    (1, 2))
+    # vectorized_x_train, vectorized_x_test = vectorize_texts_with_tokens(x_train, x_test, CountVectorizer,(1, 2))
+
+    # Векторизация без стоп-слов
+    # vectorized_x_train, vectorized_x_test = vectorize_texts_no_stopwords(x_train, x_test, CountVectorizer, (1, 2))
+
+    # Векторизация для символов
+    vectorized_x_train, vectorized_x_test = classify_with_char_vectorizer(x_train, x_test)
 
     # Шаг 4: Обучение модели логистической регрессии
     clf = train_logistic_regression(vectorized_x_train, y_train)
